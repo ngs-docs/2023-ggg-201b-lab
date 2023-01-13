@@ -2,6 +2,9 @@
 tags: ggg, ggg2023, ggg201b
 ---
 
+[![hackmd-github-sync-badge](https://hackmd.io/cD4Gl7uET9SLF3LxvKDTTg/badge)](https://hackmd.io/cD4Gl7uET9SLF3LxvKDTTg)
+
+
 
 ([Permanent URL](https://github.com/ngs-docs/2023-ggg201b-lab/blob/main/lab-1.md))
 
@@ -78,9 +81,9 @@ This says, "run the shell command in the Snakefile under the 'map_reads' rule".
 
 `-p` means "show the shell command that you're running".
 
-`-j 1`
+`-j 1` means "run one command a time". This will be relevant later ;).
 
-It will fail! Why?
+BUT. This command will fail! Why?
 
 Because we don't have any data! We need to download some stuff and prepare it.
 
@@ -94,14 +97,14 @@ That worked - that's what the green text signifies.
 
 What does this command do? It creates the file `SRR2584857_1.fastq.gz`,
 which contains a bunch of sequencing data; we'll look at this file in more
-detail later.
+detail later. For now, notice that this file appeared in the lower right window of the RStudio page!
 
 Now run some more rules, one at a time.
 
 ```
 snakemake -p -j 1 download_genome
 ```
-This creates the file `ecoli-rel606.fa.gz`.
+This downloads the file `ecoli-rel606.fa.gz`.
 
 Now run:
 ```
@@ -121,22 +124,21 @@ browser.
 You can also go to the shell prompt and execute:
 
 ```
-samtools index SRR2584857_1.ecoli-rel606.bam.sorted
-samtools tview -p ecoli:4314717 --reference ecoli-rel606.fa SRR2584857_1.ecoli-rel606.bam.sorted
+samtools index SRR2584857_1.x.ecoli-rel606.bam.sorted
+samtools tview -p ecoli:4314717 --reference ecoli-rel606.fa SRR2584857_1.x.ecoli-rel606.bam.sorted
 ```
-which will show you the actual aligned reads. (Use arrow keys to navigate, and 'q' to exit.)
+which will show you the actual aligned reads.
 
 A few things to discuss:
 
 * these are just shell commands, with a bit of "decoration". You could run them yourself if you wanted, outside of snakemake.
-* the order of the rules in the Snakefile doesn't matter
-* rules can have one or more shell commands, one after the other on their own lines
+* the order of the rules in the Snakefile doesn't matter, with one exception - the first one is what's run if no rule name is specified.
+* rules can have one or more shell commands, one after the other on their own lines - see the last rule!
 * `snakemake -p` prints the command that is being executed
-* `-j 1` says "use only one CPU". More on this later.
-* `--use-conda` says to install software as specified in the conda: block.
-* snakemake prints things out in red if it fails.
+* `-j 1` says "run only one thing at a time". More on this later.
+* snakemake prints things out in red if the command fails.
 * it's all case sensitive...
-* tabs and spacing matter.
+* tabs and spacing matter!
 
 Some foreshadowing:
 
@@ -175,3 +177,5 @@ filenames in the `shell:` block with `{input}` and `{output}` as appropriate.
 * At the moment (and in general), they run shell commands - this can include R and Python scripts, for example.
 * You can "decorate" the rules to tell snakemake how they depend on each other.
 * There are other reasons to do this that we'll get to next week!
+
+Revisit: what workflow are we running?
