@@ -12,7 +12,7 @@ Permanent link: [ngs-docs/2023-ggg-201b-lab](https://github.com/ngs-docs/2023-gg
 
 C. Titus Brown, ctbrown@ucdavis.edu, UC Davis
 
-### GitHub site: [github.com/ngs-docs/2023-ggg201b-lab](https://github.com/ngs-docs/2023-GGG201b-lab)
+### GitHub site: [github.com/ngs-docs/2023-ggg201b-lab](https://github.com/ngs-docs/2023-ggg-201b-lab)
 
 This site will contain all of the actual lab lessons, and I'll post links to them each week to canvas.
 
