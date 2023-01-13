@@ -4,14 +4,17 @@ tags: ggg, ggg2023, ggg201b
 
 # Syllabus for GGG 201(b) lab section: Genomics (Winter 2022/2023)
 
+[![hackmd-github-sync-badge](https://hackmd.io/5ue0x068SvezhwQgjhjx-A/badge)](https://hackmd.io/5ue0x068SvezhwQgjhjx-A)
+
+Permanent link: [ngs-docs/2023-ggg-201b-lab](https://github.com/ngs-docs/2023-ggg-201b-lab/blob/main/SYLLABUS.md)
 
 [toc]
 
-UC Davis
+C. Titus Brown, ctbrown@ucdavis.edu, UC Davis
 
 ### GitHub site: [github.com/ngs-docs/2023-ggg201b-lab](https://github.com/ngs-docs/2023-GGG201b-lab)
 
-This site will contain all of the actual lab lessons.
+This site will contain all of the actual lab lessons, and I'll post links to them each week to canvas.
 
 ## Code of Conduct
 
@@ -68,10 +71,20 @@ In terms of technology, we'll be using the snakemake workflow system, running on
 
 ### Lab sessions and topics
 
-Labs 1-4 - variant calling and snakemake workflows
-Labs 5-7 - de novo genome assembly
-Labs 8-10 - RNAseq for differential expression analysis
+* Labs 1-4 - variant calling and snakemake workflows
+* Labs 5-7 - de novo genome assembly
+* Labs 8-10 - RNAseq for differential expression analysis
 
 ### Teaching style
 
 The labs are taught in a very hands-on way, with an emphasis on running things first, and then going back and exploring what the commands are doing. That means that not everything is explained in detail the first, or even the second time, you see it! For the first few sessions, please bear with - hopefully it will all make sense by the end, and if not, ask questions!
+
+## Lab location
+
+Lab will be on Fridays 9-10:50am in Shields 360.
+
+Shields 360 is the DataLab classroom.
+
+It is not easy to find the first time! So plan to take a few extra minutes to get there!
+
+You can find it by going into the Shields Library, then climbing up the two flights of stairs and going to the right (or taking an elevator up to the 3rd floor). It is all the way in the back of the library on the 3rd floor, in the southeast corner. You should see a big “DataLab” sign on the wall in front of you as you walk back from the stairs in front.
