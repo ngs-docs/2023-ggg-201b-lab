@@ -10,10 +10,30 @@ tags: ggg, ggg2023, ggg201b
 
 # GGG 201b, Jan 2023 - Lab 1 NOTES
 
-## Friday Lab Outline - 1/13
+## Friday Lab Links - 1/13
 
 * [syllabus](https://hackmd.io/MCWqGjO3S0KdxJP10KPKNw?view)
 * our first workflow: variant calling!!!!!!
+
+## Introduction
+
+## Introductions!
+
+Hello! I'm Titus!
+
+* prof in Vet Med
+* research focus is metagenomics specifically and genomics more broadly
+* emphasis on data analysis, data reuse, automation, reproducibility, open science, open source, etc. etc.
+* also very community focused (open, online)
+* Faculty Director of Community Initiatives here at DataLab
+
+I use everything I'll be teaching you here on a daily basis. It's very much _au courant_ in terms of data science and data analysis in bioinformatics.
+
+On a personal level, I'm old but I think not like super old; I have two kids; I like cats and dogs both; I'm an infovore; and I like reading SF&F as well as (recently...) LitRPG.
+
+I love swimming, like yoga, and hate running, but do all three. :shrug:
+
+I blog at http://ivory.idyll.org/blog/ and I tweet at http://twitter.com/ctitusbrown and I mastodon at https://genomic.social/@ctb.
 
 ## Day 1: Variant Calling
 
@@ -129,10 +149,20 @@ samtools tview -p ecoli:4314717 --reference ecoli-rel606.fa SRR2584857_1.x.ecoli
 ```
 which will show you the actual aligned reads.
 
-A few things to discuss:
+In the alignment,
+* the top line are the positions in the E. coli genome (specified in the command line to samtools tview)
+* the second line is the sequence in the reference genome
+* the third lines and below are reads mapped to that position
+* a `.` means "this read agrees with the reference, in the forward direction"
+* a `,` means "this read agrees with the reference, in the reverse direction"
+* an A/C/T/G means "this read **disagrees* with the reference"
+
+Questions?
+
+A few things to discuss about snakemake:
 
 * these are just shell commands, with a bit of "decoration". You could run them yourself if you wanted, outside of snakemake.
-* the order of the rules in the Snakefile doesn't matter, with one exception - the first one is what's run if no rule name is specified.
+* the order of the rules in the Snakefile doesn't matter, with one exception - the first one is what's run if no rule name is specified. More on that later.
 * rules can have one or more shell commands, one after the other on their own lines - see the last rule!
 * `snakemake -p` prints the command that is being executed
 * `-j 1` says "run only one thing at a time". More on this later.
@@ -145,37 +175,10 @@ Some foreshadowing:
 * wouldn't it be nice to not have to run each rule one by one, in the right order?
 * wouldn't it be nice if the command didn't rerun if it had already run?
 
-### Upgrading our Snakefile by adding 'output:'
-
-Edit `Snakefile` and add:
-and add `output: "SRR2584857_1.fastq.gz"` to the `download_data` rule.
-Be sure to match the indentation within the rule.
-
-Now try running the rule: `snakemake -p SRR2584857_1.fastq.gz`
-
-Run it again. Hey look, it doesn't do anything! Why??
-
-Try removing the file: `rm SRR2584857_1.fastq.gz`. Now run the rule again.
-
-### Upgrading our Snakefile by adding `input:`.
-
-To the `map_reads` rule, add:
-
-`input: "SRR2584857_1.fastq.gz", "ecoli-rel606.fa.gz"`
-
-What does this do? (And does it work?)
-
-### Rewrite the rule shell blocks to use `{input}` and `{output}`
-
-For each rule where you have defined `input:` and `output:` you can replace the
-filenames in the `shell:` block with `{input}` and `{output}` as appropriate.
-
 ### End of class recap
 
 * Snakefile contains a snakemake workflow definition
 * the rules specify steps in the workflow
 * At the moment (and in general), they run shell commands - this can include R and Python scripts, for example.
-* You can "decorate" the rules to tell snakemake how they depend on each other.
-* There are other reasons to do this that we'll get to next week!
 
 Revisit: what workflow are we running?
