@@ -2,6 +2,9 @@
 tags: ggg, ggg2023, ggg201b
 ---
 
+[![hackmd-github-sync-badge](https://hackmd.io/blTQPBmUSye88bmeRodDyA/badge)](https://hackmd.io/blTQPBmUSye88bmeRodDyA)
+
+
 [toc]
 
 ([Permanent URL](https://github.com/ngs-docs/2023-ggg201b-lab/blob/main/lab-2.md))
@@ -43,11 +46,26 @@ Edit `Snakefile` and add:
 and add `output: "SRR2584857_1.fastq.gz"` to the `download_data` rule.
 Be sure to match the indentation within the rule.
 
-Now try running the rule: `snakemake -p SRR2584857_1.fastq.gz`
+It should look like this:
+```python=
+rule download_data:
+    output: "SRR2584857_1.fastq.gz"
+    shell: """
+        curl -JLO https://osf.io/4rdza/download
+    """
+```
 
-Run it again. Hey look, it doesn't do anything! Why??
+Now try running the rule:
+```
+snakemake -j 1 -p SRR2584857_1.fastq.gz
+```
 
-Try removing the file: `rm SRR2584857_1.fastq.gz`. Now run the rule again.
+Hey look, it doesn't do anything! Why??
+
+Try removing the file: `rm SRR2584857_1.fastq.gz`. Now run the rule again, and again.
+
+What's happening here is that snakemake is "smart" enough to know that if the output file exists, it doesn't need to be recreated. So once you tell it what the output of a rule is, it gets smarter about running it.
+
 
 ### Upgrading our Snakefile by adding `input:`.
 
@@ -59,45 +77,27 @@ input: "ecoli-rel606.fa.gz", "SRR2584857_1.fastq.gz"
 
 What does this do? (And does it work?)
 
-### Rewrite the rule shell blocks to use `{input}` and `{output}`
-
-For each rule where you have defined `input:` and `output:` you can replace the
-filenames in the `shell:` block with `{input}` and `{output}` as appropriate.
-
-### Upgrading our Snakefile by adding 'output:'
-
-Edit the snakefile in RStudio, and add
+Try something: remove the reads file, `SRR2584857_1.fastq.gz` like so:
 ```
-    output: "SRR2584857_1.fastq.gz"
+rm SRR2584857_1.fastq.gz
 ```
-to the `download_data` rule before the `shell:` line. Be sure to get the
-indentation right - it needs to be at the same level as `conda:` and `shell:`! It should look like this:
-```python=
-rule download_data:
-    output: "SRR2584857_1.fastq.gz"
-    shell: """
-        curl -JLO https://osf.io/4rdza/download
-    """
+and now try running map_reads:
+```
+snakemake -j 1 -p map_reads
 ```
 
-And try running the rule: `snakemake -p -j 1 download_data`
+Snakemake will automatically figure out what rules to run based on matching input and output blocks, so you no longer need to _first_ run download_data and _then_ run map_reads!
 
-Run it twice. Hey look, it doesn't do anything the second time! Why??
-
-Try removing the file: `rm SRR2584857_1.fastq.gz`. Now run the rule again. It's aliiiiiive!
-
-What's happening here is that snakemake is "smart" enough to know that if the output file exists, it doesn't need to be recreated. So once you tell it what the output of a rule is, it gets smarter about running it.
-
-### Upgrading our Snakefile by adding `output` and `input:`.
+### Upgrading our Snakefile by adding `output` and `input:` to more rules:
 
 To the `download_genome` rule, add:
-```
+```python=
     output: "ecoli-rel606.fa.gz"
 ```
 
 and to the `map_reads` rule, adjust it to look like this:
 
-```
+```python=
     input:
         ref="ecoli-rel606.fa.gz", 
         reads="SRR2584857_1.fastq.gz"
@@ -105,7 +105,7 @@ and to the `map_reads` rule, adjust it to look like this:
 
 What does this do?
 
-This tells snakemake that `map_reads` depends on having the input files `ecoli-rel606.fa.gz` and `SRR2584857_1.fastq.gz` in this directory, and that `download_genome` can produce it!!
+This tells snakemake that `map_reads` depends on having the input files `ecoli-rel606.fa.gz` and `SRR2584857_1.fastq.gz` in this directory, and that `download_genome` can produce the ecoli file!!
 
 What's extra cool is that snakemake will now automatically run the rule that outputs this file (which is `download_genome`) before running `map_reads`!
 
@@ -113,11 +113,11 @@ Try it:
 
 ```
 rm *.gz *.sam
-snakemake -p -j 1 --use-conda map_reads
+snakemake -p -j 1 map_reads
 ```
 and you'll see that it runs two things: first the `download_genome` rule, then the `map_reads` rule.
 
-What is the output of the rule `map_reads` and how would you find that out in general?
+What is the output of the rule `map_reads`, and how would you find that out in general?
 
 ### In-class exercise A
 
@@ -159,7 +159,7 @@ shell commands that make use of `{input}` and `{output}`?
 
 Note: you can rerun everything by doing `rm *.sam *.gz` followed by
 ```
-snakemake -j 1 --use-conda map_reads
+snakemake -j 1 map_reads
 ```
 
 ### In-class exercise C
@@ -174,7 +174,7 @@ If you've fixed the rules properly, you should be able to run everything up to t
 
 ```
 rm *.gz *.sam
-snakemake -p -j 1 --use-conda call_variants
+snakemake -p -j 1 call_variants
 ```
 
 ### Re-running everything
@@ -194,7 +194,7 @@ and run that.
 
 So:
 ```
-snakemake -p -j 1 --use-conda SRR2584857_1.ecoli-rel606.vcf
+snakemake -p -j 1 SRR2584857_1.ecoli-rel606.vcf
 ```
 will also work to run the rule `call_variants`, but you don't have to remember the rule name.
 
