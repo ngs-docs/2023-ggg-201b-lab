@@ -6,6 +6,8 @@ tags: ggg, ggg2023, ggg201b
 
 [toc]
 
+[![hackmd-github-sync-badge](https://hackmd.io/9xxM8Hk_Tha7hWLM1CfLLQ/badge)](https://hackmd.io/9xxM8Hk_Tha7hWLM1CfLLQ)
+
 ([Permanent URL](https://github.com/ngs-docs/2023-ggg201b-lab/blob/main/lab-3.md))
 
 ## Friday Lab Links - 1/27
