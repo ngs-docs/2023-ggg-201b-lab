@@ -4,6 +4,8 @@ tags: ggg, ggg2023, ggg201b
 
 # Lab 4 NOTES - GGG 201b, Feb 3, 2023
 
+[![hackmd-github-sync-badge](https://hackmd.io/xfIznmofSIeYXk-F76qIJg/badge)](https://hackmd.io/xfIznmofSIeYXk-F76qIJg)
+
 [toc]
 
 ([Permanent URL](https://github.com/ngs-docs/2023-ggg201b-lab/blob/main/lab-4.md))
@@ -14,9 +16,55 @@ Today we're going to continue _generalize_ our Snakefile so that we can re-use t
 
 We'll also revisit the variant calling pipeline at the end. Promise
 
-## Updating our Snakefile with a default rule & wildcard rules
+## But first - logging into farm and running RStudio there!
 
-@@ CTB
+If you're not in GGG 298, you should have received an e-mail and password from me this morning.
+
+(If you're in GGG 298, you can reuse that same account!)
+
+Please follow [these intructions](https://hackmd.io/n7_pXRiiRQ-YpQBQ93uW9Q?view#1-Logging-into-farm) to log into farm and start up RStudio Server.
+
+If you've done this successfully, please look around you and see if you can help others. I'll set up Windows and Mac UNIX breakout rooms for support, too :).
+
+### Logging into farm - a short summary.
+
+FIRST: log into farm with ssh.
+
+Then run:
+```
+srun -p high2 --time=3:00:00 --nodes=1 \
+    --cpus-per-task 1 --mem 5GB --pty /bin/bash
+```
+when that succeeds, run:
+```
+module load spack/R/4.1.1
+module load rstudio-server/2022.07.1
+rserver-farm
+```
+
+Take the information in the output, and then run the custom `ssh -L ...` command in a _new_ Terminal or MobaXterm window on your laptop.
+
+Then go visit the localhost URL printed out by the rserver farm command, and use the password printed out by `rserver-farm`.
+
+Once you're into RStudio, start a Terminal window. Voila!
+
+Now run:
+```
+mamba create -n vc -y snakemake-minimal \
+    bcftools=1.8 samtools=1.6 minimap2=2.24
+```
+
+and then
+```
+mamba activate vc
+```
+and you're now ready to go!
+
+You'll need to run `mamba activate vc` if you log out and log back in.
+
+You can read more about what's going on [here](https://hackmd.io/4Tm5i97QT5iDlZL-IC7U8A?view#Running-RStudio-Server).
+
+## Alternate for this week only: binder.
 
 Start your binders -
 
@@ -29,7 +77,11 @@ and adjust your prompt if you like:
 PS1='$ '
 ```
 
-### Running lots of commands all at once
+(For next week, you will want to have the farm login and RStudio above working.)
+
+## Updating our Snakefile with a default rule & wildcard rules
+
+### Revisit: Running lots of commands all at once
 
 Now that we've connected all the rules with input/output, we can run everything _up to_ the rule `call_variants` by just specifying `call_variants` - try it!
 
@@ -136,8 +188,23 @@ to actually _look_ at the aligned reads.
 * You can "decorate" the rules to tell snakemake how they depend on each other.
 * There are other reasons to do this that we'll get to next week!
 
-### What's next? Further generalizing with wildcards!
+### What's next? Fix the last rule up a bit.
 
-@@ctb check search replace in RStudio
+Let's split the last rule up into two different rules:
 
+* create ecoli-ref.fa
+* call variants
 
+FIRST, create a new rule `uncompress_ref`.
+
+THEN, move the relevant input, output, and shell command stuff out of `call_variants` into the new rule.
+
+### Then, further generalizing with wildcards!
+
+search/replace:
+* `SRR2584857_1` => `{sample}`
+* `ecoli-rel606` => `{genome}`
+
+Does the resulting Snakefile work?
+
+What's going on here?
