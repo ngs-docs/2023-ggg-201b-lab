@@ -18,7 +18,13 @@ Today we're going to further _generalize_ our Snakefile so that we can re-use th
 
 ## Getting started - logging into farm!
 
-We suggest using RStudio to run the below commands as it will give you an editor and a terminal. **Follow [these instructions]((https://hackmd.io/n7_pXRiiRQ-YpQBQ93uW9Q?view#2-Start-and-connect-to-an-RStudio-Server-on-farm))** or see the spoiler below for a quickstart.
+We suggest using RStudio to run the below commands as it will give you an editor and a terminal. **Follow [these instructions](https://hackmd.io/n7_pXRiiRQ-YpQBQ93uW9Q?view#2-Start-and-connect-to-an-RStudio-Server-on-farm)** or see the spoiler below for a quickstart.
+
+Note - I've changed the `srun` instructions to use more resources:
+```
+srun -p high2 --time=3:00:00 --nodes=1 \
+    --cpus-per-task 4 --mem 10GB --pty /bin/bash
+```
 
 :::spoiler **Logging into farm and running RStudio Server**
 
@@ -29,7 +35,7 @@ Log into farm with ssh/MobaXterm - [link](https://hackmd.io/n7_pXRiiRQ-YpQBQ93uW
 Then run:
 ```
 srun -p high2 --time=3:00:00 --nodes=1 \
-    --cpus-per-task 1 --mem 5GB --pty /bin/bash
+    --cpus-per-task 4 --mem 10GB --pty /bin/bash
 ```
 and wait for a new prompt. Then run:
 ```
@@ -61,7 +67,7 @@ If it doesn’t, please alert me!
 Next, run:
 ```
 mamba create -n vc -y snakemake-minimal \
-    bcftools=1.8 samtools=1.6 minimap2=2.24
+    bcftools=1.8 samtools=1.16.1 minimap2=2.24
 ```
 
 You may get an error if it already exists - that's ok!
@@ -71,6 +77,13 @@ Now activate this mamba environment to use the installed collection of software:
 mamba activate vc
 ```
 and you're now ready to go!
+
+### Update samtools
+
+Addendum for lab 5: let's also update samtools so we can use the `coverage` command:
+```
+mamba install -n vc -y samtools=1.16.1
+```
 
 ### Download Snakefile for lab 5:
 
@@ -111,27 +124,18 @@ snakemake -p -j 1 call_variants
 
 ![diagram of workflow](https://github.com/ngs-docs/2023-ggg-201b-lab/blob/main/lab-4/snakemake-graph.png?raw=true)
 
-* what does each step do?
-* what's the goal?
-
 ### Summarizing information from the alignments
 
-Try:
+Try the following commands:
 
 ```
 samtools flagstat SRR2584857_1.x.ecoli-rel606.bam
 ```
+and
 
-:::warning
-Why does this command not work?
 ```
-samtools depth SRR2584857_1.x.ecoli-rel606.bam
+samtools coverage -m SRR2584857_1.x.ecoli-rel606.bam.sorted
 ```
-
-Why does this last command not work?
-
-What's the command that _does_ work?
-:::
 
 ### Using filenames instead of rule names
 
@@ -185,9 +189,33 @@ FIRST, create a new rule `uncompress_ref`.
 
 THEN, move the relevant input, output, and shell command stuff out of `call_variants` into the new rule.
 
+Here's the result:
+```python
+rule uncompress_ref:
+    input:
+        ref="ecoli-rel606.fa.gz",
+    output: 
+        ref="ecoli-rel606.fa",
+    shell: "gunzip -k {input.ref}"
+
+rule call_variants:
+    input:
+        bam="SRR2584857_1.x.ecoli-rel606.bam.sorted",
+        ref="ecoli-rel606.fa",
+    output:
+        pileup="SRR2584857_1.x.ecoli-rel606.pileup",
+        bcf="SRR2584857_1.x.ecoli-rel606.bcf",
+        vcf="SRR2584857_1.x.ecoli-rel606.vcf",
+    shell: """
+        bcftools mpileup -Ou -f {input.ref} {input.bam} > {output.pileup}
+        bcftools call -mv -Ob {output.pileup} -o {output.bcf}
+        bcftools view {output.bcf} > {output.vcf}
+    """
+```
+
 ### Further generalizing with wildcards!
 
-search/replace:
+search/replace in RStudio:
 * `SRR2584857_1` => `{sample}`
 * `ecoli-rel606` => `{genome}`
 
@@ -195,16 +223,127 @@ Does the resulting Snakefile work?
 
 What's going on here?
 
-CTB: put full Snakefile here.
+:::info
+CTB note to self: put full Snakefile here!
+:::
 
-### Adding the complete file, and more files.
+### Adding the complete data file.
 
 So far we've been working with a cut-down file; let's work with more data, and more files!
 
-First, copy files over from my account on farm:
+First, copy four files over from my account on farm:
 ```
-cp ~ctbrown/data/ggg201b/SRR258*_1.fastq.gz .
+cp ~ctbrown/data/ggg201b/SRR258*_1.fastq.gz ./
 ```
 
-* rerun pipeline
-* assessing depth
+Next, remove the `download_data` rule, and rerun the pipeline:
+
+```
+snakemake -j 1 -p
+```
+
+### Complete Snakefile
+
+```python
+rule all:
+    input:
+        "SRR2584857_1.x.ecoli-rel606.vcf"
+
+rule download_genome:
+    output: "{genome}.fa.gz"
+    shell:
+        "curl -JLO https://osf.io/8sm92/download -o {output}"
+
+rule map_reads:
+    input:
+        reads="{sample}.fastq.gz",
+        ref="{genome}.fa.gz"
+    output: "{sample}.x.{genome}.sam"
+    shell: """
+        minimap2 -ax sr {input.ref} {input.reads} > {output}
+    """
+
+rule sam_to_bam:
+    input: "{sample}.x.{genome}.sam",
+    output: "{sample}.x.{genome}.bam",
+    shell: """
+        samtools view -b -F 4 {input} > {output}
+     """
+
+rule sort_bam:
+    input: "{sample}.x.{genome}.bam"
+    output: "{sample}.x.{genome}.bam.sorted"
+    shell: """
+        samtools sort {input} > {output}
+    """
+    
+rule uncompress_ref:
+    input:
+        ref="{genome}.fa.gz",
+    output: 
+        ref="{genome}.fa",
+    shell: "gunzip -k {input.ref}"
+
+rule call_variants:
+    input:
+        bam="{sample}.x.{genome}.bam.sorted",
+        ref="{genome}.fa",
+    output:
+        pileup="{sample}.x.{genome}.pileup",
+        bcf="{sample}.x.{genome}.bcf",
+        vcf="{sample}.x.{genome}.vcf",
+    shell: """
+        bcftools mpileup -Ou -f {input.ref} {input.bam} > {output.pileup}
+        bcftools call -mv -Ob {output.pileup} -o {output.bcf}
+        bcftools view {output.bcf} > {output.vcf}
+    """
+```
+
+This will take longer... why?
+
+Let's take a look at the VCF! How has it changed?
+
+### Adding new sample:
+
+```
+rule all:
+    input:
+        "SRR2584857_1.x.ecoli-rel606.vcf",
+        "SRR2584403_1.x.ecoli-rel606.vcf"
+```
+
+### samtools flagstat & coverage
+
+Let's run the BAM diagnostics again.
+
+Look at flagstat:
+```
+samtools flagstat SRR2584857_1.x.ecoli-rel606.bam
+```
+Look at coverage:
+
+```
+samtools coverage -m SRR2584857_1.x.ecoli-rel606.bam.sorted
+```
+
+### Assess actual reads:
+
+We can also look at the reads again:
+```
+samtools index SRR2584857_1.x.ecoli-rel606.bam.sorted
+samtools tview -p ecoli:920514 --reference ecoli-rel606.fa SRR2584857_1.x.ecoli-rel606.bam.sorted
+```
+(use `q` to exit the tview)
+
+### Filtering:
+
+Adjust the bcftools view command to look like this instead:
+```
+        bcftools filter -Ov -e 'QUAL<40 || DP<10 || GT!="1/1"' {input} > {output}
+```
+
+and then remove the VCF file and rerun:
+```
+rm *.vcf
+snakemake -j 1 -p
+```
