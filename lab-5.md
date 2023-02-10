@@ -4,6 +4,9 @@ tags: ggg, ggg2023, ggg201b
 
 # Lab 5 NOTES - GGG 201b, Feb 10, 2023
 
+[![hackmd-github-sync-badge](https://hackmd.io/GcvRjLFIQqaAViuDNj-1hQ/badge)](https://hackmd.io/GcvRjLFIQqaAViuDNj-1hQ)
+
+
 [toc]
 
 ([Permanent URL](https://github.com/ngs-docs/2023-ggg201b-lab/blob/main/lab-5.md))
