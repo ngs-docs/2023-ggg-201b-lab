@@ -5,7 +5,7 @@ tags: ggg, ggg2023, ggg201b
 
 [![hackmd-github-sync-badge](https://hackmd.io/rI34wge-ScmkSQ0mIx2QTQ/badge)](https://hackmd.io/rI34wge-ScmkSQ0mIx2QTQ)
 
-([Permanent link on github](https://github.com/ngs-docs/2023-GGG201b-lab/blob/main/hw-1.md))
+([Permanent link on github](https://github.com/ngs-docs/2023-ggg-201b-lab/blob/main/hw-1.md))
 
 Due by 10pm, Wed Feb 22nd
 
@@ -21,7 +21,7 @@ Sign up for GitHub Classroom using [this link](https://classroom.github.com/a/zK
 
 (Estimate: 5 minutes)
 
-Create a personal access token (PAT) [per GitHub instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token); you'll need to select the 'repo' scope for it, and I suggest using a 90 day expiration period. 
+Create a "classic-style" personal access token (PAT) [per GitHub instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token); you'll need to select the 'repo' scope for it, and I suggest using a 90 day expiration period.   _(Don't create a fine-grained token, I haven't figured out how to make them work yet!)_
 
 ::::warning
 The PAT is a long string of nonsense characters (usually starting with `ghp_`) that you will use in place of a password, below.
@@ -30,7 +30,7 @@ Be sure to save your PAT somewhere where you can find it.
 
 You can run
 ```
-git config credential.helper store
+git config --global credential.helper store
 ```
 once on farm, so that your PAT will be stored in your account for you, too.
 ::::
@@ -47,21 +47,38 @@ Change into that directory:
 cd ~/201b-lab-hw1/
 ```
 
-and start up a 2 hour session on a compute node:
+and last but not least, activate the mamba environment containing the variant calling software:
 ```
-srun -p high2 -t 2:00:00 -c 4 --mem=10GB --pty bash
+mamba activate vc
 ```
 
-**You'll need to use srun, change directories, and activate the `vc` conda environment every time you log in to farm.**
+:::info
+If that doesn't work, you may need to create the mamba environment:
+```
+mamba create -n vc -y snakemake-minimal \
+    bcftools=1.8 samtools=1.16.1 minimap2=2.24
+```
+:::
+
+:::warning
+**You'll need to change directories and activate the `vc` conda environment every time you log in to farm.**
+
+**Also: Make sure you are running in an `srun` - either because you're working in RStudio, or you are not using RStudio Server but you're doing an srun at the terminal.**
+:::
 
 ## 3. Run the current workflow
 
 (Estimate: 15 minutes)
 
+Copy in the raw data:
+```
+cp ~ctbrown/data/ggg201b/SRR258*_1.fastq.gz ./
+```
+
 Make sure you can successfully run the current workflow:
 
 ```
-snakemake -j 1 -p call_variants
+snakemake -j 1 -p SRR2584403_1.x.ecoli-rel606.vcf
 ```
 which should produce a file `SRR2584857_1.x.ecoli-rel606.vcf`.
 
@@ -89,15 +106,13 @@ You cannot (1) make changes on GitHub, (2) make independent changes on farm, and
 
 ---
 
-1. (a) Add three more samples to the Snakefile, and create a default rule so that all four samples are run. (b) Rename the final VCF file so that it is named `.sensitive.vcf`. (c) Then add the filter command from the bottom of [Lab 5](https://hackmd.io/GcvRjLFIQqaAViuDNj-1hQ?view) to a new rule that runs on the `.sensitive.vcf` file and creates a file named `.specific.vcf`.
-
-Please revisit [Lab 5 notes](https://hackmd.io/GcvRjLFIQqaAViuDNj-1hQ?view) to copy the four data files into your account.
+1. (a) Add three more samples to the Snakefile, and create a default rule so that all four samples are run. (b) Change the Snakefile so that the final VCF file produced for each sample is named `.sensitive.vcf`. (c) Finally, add the filter command from the bottom of [Lab 5](https://hackmd.io/GcvRjLFIQqaAViuDNj-1hQ?view) to a new rule that runs on the `.sensitive.vcf` file and creates a file named `.specific.vcf`.
 
 Add them to your Snakefile so that (a) running `snakemake -j 1` without any targets generates two sets of VCF files for each data set.
 
 Please make sure of the following:
 
-* Running `snakemake -j 1 -p` by itself should go from raw data to final results for all samples;
+* Running `snakemake -j 1 -p` by itself should go from raw data to final results for all samples; this includes both `sensitive.vcf` _and_ `specific.vcf`.
 * All of the generated files (including intermediates) are in at least one 'output:' annotation, so that e.g. `snakemake --delete-all-output` removes all of the generated files in the directory.
 
 ## 5. Commit and push your changes back to github.
@@ -129,3 +144,31 @@ You can reach me via e-mail at ctbrown@ucdavis.edu, or in UC Davis slack under @
 
 <!-- tell them: check for number of variants; run commands from scratch in empty directory; check diff sens/spec 
 -->
+
+## Appendix - screenshots of the Personal Authentication Token process on GitHub
+
+### Go to settings, generate classic token
+
+![](https://hackmd.io/_uploads/SyYxwgg0s.png)
+
+### Give it a name, expiration date, and "repo" scope
+
+![](https://hackmd.io/_uploads/BktZDggCs.png)
+
+### Copy this ghp_ string as your password to github on farm
+
+![](https://hackmd.io/_uploads/S1MGDgxAs.png)
+
+### Use your github username and the ghp_ string as your password when cloning
+
+![](https://hackmd.io/_uploads/B1qfPglRo.png)
+
+## Appendix 2
+
+If you can't get the PAT to work, do your work in a clone of a public repository:
+
+```
+git clone https://github.com/ngs-docs/2023-ggg-201b-lab-hw1 ~/201b-lab-hw1/
+```
+
+and then talk to Titus about how to submit it.
