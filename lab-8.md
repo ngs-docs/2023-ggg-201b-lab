@@ -4,6 +4,9 @@ tags: ggg, ggg2023, ggg201b
 
 # Lab 8 NOTES - GGG 201b, March 3rd, 2023
 
+[![hackmd-github-sync-badge](https://hackmd.io/Qk0fJEMMRZ-tZUZ8Wh25wg/badge)](https://hackmd.io/Qk0fJEMMRZ-tZUZ8Wh25wg)
+
+
 
 ## Friday Lab links
 
