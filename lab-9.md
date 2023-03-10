@@ -4,6 +4,9 @@ tags: ggg, ggg2023, ggg201b
 
 # Lab 9 NOTES - GGG 201b, March 10th, 2023
 
+[![hackmd-github-sync-badge](https://hackmd.io/O2KaLpquTxOD8aI-JMEErQ/badge)](https://hackmd.io/O2KaLpquTxOD8aI-JMEErQ)
+
+
 [Permanent link on GitHub: lab-9.md](https://github.com/ngs-docs/2023-ggg-201b-lab/blob/main/lab-9.md)
 
 ## Friday Lab links
