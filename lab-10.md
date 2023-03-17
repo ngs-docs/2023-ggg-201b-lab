@@ -62,6 +62,7 @@ conda activate rnaseq
 
 and do:
 ```
+cd ~/lab9-rnaseq
 snakemake -j 4 --use-conda
 ```
 
