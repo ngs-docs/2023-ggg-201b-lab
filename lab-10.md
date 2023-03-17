@@ -62,14 +62,18 @@ conda activate rnaseq
 
 and do:
 ```
-snakemake -j 4
+snakemake -j 4 --use-conda
 ```
 
 This should succeed - and may not run anything at all!
 
 ## Experimental setup - what is this RNAseq?
 
-<!-- @@ -->
+The data sets are from [How many biological replicates are needed in an RNA-seq experiment and which differential expression tool should you use?](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4878611/), Schurch et al., 2016.
+
+The experiment being conducted (and analyzed by us) is a comparison of yeast gene expression, wt vs snf2 knockout.
+
+Q: how would you figure out what the individual accession IDs match to? Hint: use [the ENA browser](https://www.ebi.ac.uk/ena/browser/home) and look up one (or each of) the accessions.
 
 ## Walking through the notebook
 
@@ -77,7 +81,7 @@ Discuss:
 * CSV table of samples and conditions
 * normalization
 * results table & adjusted p-value; multiple testing
-* MA plot
+* MA plot; log2; why this shape?
 * individual gene plot
 * MDS plot
 * heatmap plot; and clustering
@@ -123,8 +127,27 @@ My main advice to you is this:
 * only then go back and start thinking about optimizing individual steps;
 * this is because the large majority of the time, your data or your interpretation will be more of a problem than your bioinformatics workflow
 
+How can you get more practice on this stuff? My first recommendation is to _do something, anything_ and then work through any problems you have ;). If you don't practice this stuff, you will not learn it.
 
-## Appendix: homework stuff
+[DataLab](https://datalab.ucdavis.edu/) runs various workshops and trainings, and there are some good intro R and Python workshops here!
+
+### Peer Organized 'Omics Help
+
+You might also be interested in this:
+
+>Hello fellow computational academics! 
+ 
+>A few graduate students and I have recently gotten together and started up a bioinformatics work group named Peer Organized 'Omics Help (POOH for short). The purpose of this group is to provide a space for grad students and other academic researchers to get together and help each other with code and various types of computer work. As the name implies, we are mostly focused on the analysis of various types of 'omics data, but can be convinced to consider other datasets! This can also be a great opportunity to get additional help with our course material or ideas of how to implement our course material in your own research. 
+ 
+>If this sounds like something that interests you, please feel free to drop by! We are currently meeting every Thursday at 2:00 pm in the data lab classroom (Shields 360). You are also welcome to join via zoom (https://ucdavis.zoom.us/j/96875291856). There is also a slack page where you can post questions and get help (https://join.slack.com/t/peerorganized-vup8803/shared_invite/zt-1pttsrclv-zh6vVnyY6~wtPkxAEmYKsA)! 
+ 
+>Feel free to email me at dlsbardellati@ucdavis.edu if you have any questions. 
+
+>Hope to see you there! 
+
+
+
+## Appendix: homework #2 stuff
 
 Use:
 
@@ -132,4 +155,12 @@ Use:
 module load rstudio-server/2022.12.0
 rstudio-launch
 ```
-to run RStudio.
+to run RStudio _not_ in a conda environment.
+
+To run it in a conda environment, use `conda run ...` as at the beginning of these notes.
+
+## Appendix: isoform quantification
+
+See [Comparative evaluation of full-length isoform quantification from RNA-Seq](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04198-1):
+
+>Salmon, kallisto, RSEM, and Cufflinks exhibit the highest accuracy on idealized data, while on more realistic data they do not perform dramatically better than the simple approach. We determine the structural parameters with the greatest impact on quantification accuracy to be length and sequence compression complexity and not so much the number of isoforms. The effect of incomplete annotation on performance is also investigated. Overall, the tested methods show sufficient divergence from the truth to suggest that full-length isoform quantification and isoform level DE should still be employed selectively.
